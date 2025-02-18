@@ -138,6 +138,12 @@ export interface PrinterStateMiscellaneous {
     max_power?: number
 }
 
+export interface PrinterStateMiscellaneousSensor {
+    name: string
+    value: number
+    unit: string
+}
+
 export interface PrinterStateFilamentSensors {
     name: string
     enabled: boolean

@@ -7,6 +7,7 @@ import {
     PrinterStateFan,
     PrinterStateFilamentSensors,
     PrinterStateMiscellaneous,
+    PrinterStateMiscellaneousSensor,
     PrinterStateMcu,
     PrinterStateMacro,
     PrinterGetterObject,
@@ -383,6 +384,44 @@ export const getters: GetterTree<PrinterState, RootState> = {
 
             return 0
         })
+    },
+
+    getMiscellaneousSensors: (state) => {
+        const output: PrinterStateMiscellaneousSensor[] = []
+        const supportedObjects = ['analog_input']
+
+        for (const [key, value] of Object.entries(state)) {
+            const nameSplit = key.split(' ')
+
+            if (supportedObjects.includes(nameSplit[0])) {
+                const name = nameSplit.length > 1 ? nameSplit[1] : nameSplit[0]
+                if (!name.startsWith('_')) {
+                    const unit = 'unit' in value ? value.unit : null
+
+                    const tmp = {
+                        name: name,
+                        value: value.value,
+                        unit: unit,
+                    }
+                    output.push(tmp)
+                }
+            }
+        }
+
+        output.sort((a, b) => {
+            if (a.unit < b.unit) return -1
+            if (a.unit > b.unit) return 1
+
+            const nameA = a.name.toUpperCase()
+            const nameB = b.name.toUpperCase()
+
+            if (nameA < nameB) return -1
+            if (nameA > nameB) return 1
+
+            return 0
+        })
+
+        return output
     },
 
     getAvailableHeaters: (state) => {

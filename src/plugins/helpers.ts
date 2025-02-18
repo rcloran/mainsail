@@ -1,3 +1,4 @@
+import { mdiGauge, mdiLightningBoltOutline, mdiFlash, mdiThermometer, mdiMeterElectricOutline } from '@mdi/js'
 import { FileStateFile } from '@/store/files/types'
 import { PrinterStateMacroParams } from '@/store/printer/types'
 import Vue from 'vue'
@@ -290,4 +291,24 @@ export function escapePath(path: string): string {
         .split('/')
         .map((part) => encodeURIComponent(part))
         .join('/')
+}
+
+export const unitToSymbol = (unit: string): string => {
+    if (['wh', 'kwh', 'mwh', 'j'].includes(unit?.toLowerCase())) {
+        return mdiLightningBoltOutline
+    }
+
+    if (['w', 'v'].includes(unit?.toLowerCase())) {
+        return mdiFlash
+    }
+
+    if (unit?.toLowerCase() === 'a') {
+        return mdiMeterElectricOutline
+    }
+
+    if (['°c', 'c', '°f', 'f', '°'].includes(unit?.toLowerCase())) {
+        return mdiThermometer
+    }
+
+    return mdiGauge
 }
