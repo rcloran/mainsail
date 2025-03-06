@@ -388,27 +388,41 @@ export const getters: GetterTree<PrinterState, RootState> = {
 
     getMiscellaneousSensors: (state) => {
         const output: PrinterStateMiscellaneousSensor[] = []
-        const supportedObjects = ['analog_input']
+        const supportedObjects = ['analog_input', 'gcode_button', 'load_cell']
 
         for (const [key, value] of Object.entries(state)) {
             const nameSplit = key.split(' ')
 
-            if (supportedObjects.includes(nameSplit[0])) {
-                const name = nameSplit.length > 1 ? nameSplit[1] : nameSplit[0]
-                if (!name.startsWith('_')) {
-                    const unit = 'unit' in value ? value.unit : null
+            if (!supportedObjects.includes(nameSplit[0])) continue
+            const name = nameSplit.length > 1 ? nameSplit[1] : nameSplit[0]
+            if (name.startsWith('_')) continue
 
-                    const tmp = {
-                        name: name,
-                        value: value.value,
-                        unit: unit,
-                    }
-                    output.push(tmp)
-                }
+            const basis = {
+                name: name,
+                type: nameSplit[0],
+                value: 'value' in value ? value.value : null,
+                unit: 'unit' in value ? value.unit : '',
+            }
+            if (nameSplit[0] == 'gcode_button') {
+                output.push({
+                    ...basis,
+                    value: value.state,
+                })
+            } else if (nameSplit[0] == 'load_cell') {
+                output.push({
+                    ...basis,
+                    value: value.force_g,
+                    unit: 'g',
+                })
+            } else {
+                output.push(basis)
             }
         }
 
         output.sort((a, b) => {
+            if (a.type < b.type) return -1
+            if (a.type > b.type) return 1
+
             if (a.unit < b.unit) return -1
             if (a.unit > b.unit) return 1
 

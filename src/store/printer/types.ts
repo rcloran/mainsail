@@ -139,6 +139,7 @@ export interface PrinterStateMiscellaneous {
 }
 
 export interface PrinterStateMiscellaneousSensor {
+    type: string
     name: string
     value: number
     unit: string
